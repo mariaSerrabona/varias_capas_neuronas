@@ -22,7 +22,7 @@
 #---------------------------------------------
 
 import pandas as pnd
-observaciones = pnd.read_csv("datas/sonar.all-data.csv")
+
 
 
 #---------------------------------------------
