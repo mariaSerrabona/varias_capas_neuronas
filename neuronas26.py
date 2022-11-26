@@ -1,18 +1,22 @@
-from preparacion_datos_12 import datos_preparados
-import TensorFLow as tf
-import pandas as pnd
 
-class neurona12():
+
+import pandas as pnd
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+from preparacion_datos_26 import datos_preparados
+
+
+#---------------------------------------------
+# FUNCIÓN DE CREACIÓN DE LA RED NEURONAL
+#---------------------------------------------
+class neurona26():
 
     def __init__(self ,tasa_aprendizaje, epochs, red):
         self.tasa_aprendizaje=tasa_aprendizaje
         self.epochs=epochs
-
-
-
-    #---------------------------------------------
-    # FUNCIÓN DE CREACIÓN DE LA RED NEURONAL
-    #---------------------------------------------
 
     def creacion_red_neuronal(self):
 
@@ -22,7 +26,7 @@ class neurona12():
 
         datos_preparados=datos_preparados( X, y)
 
-        def red_neuronas_multicapa(datos_preparados.pesos(), datos_preparados.peso_sesgo()):
+        def red_neuronas_multicapa( datos_preparados.pesos(), datos_preparados.peso_sesgo() ):
 
             #Cálculo de la activación de la primera capa
             primera_activacion = tf.math.sigmoid(tf.linalg.matmul(datos_preparados.neuEntrada(), datos_preparados.pesos()['capa_entrada_hacia_oculta']) + datos_preparados.peso_sesgo()['datos_preparados.peso_sesgo()_capa_entrada_hacia_oculta'])
@@ -31,10 +35,12 @@ class neurona12():
             activacion_capa_oculta = tf.math.sigmoid(tf.linalg.matmul(primera_activacion, datos_preparados.pesos()['capa_oculta_hacia_salida']) + datos_preparados.peso_sesgo()['datos_preparados.peso_sesgo()_capa_oculta_hacia_salida'])
 
             return activacion_capa_oculta
-    #---------------------------------------------
-    # CREACIÓN DE LA RED NEURONAL
-    #---------------------------------------------
-        red = red_neuronas_multicapa(datos_preparados.neuEntrada(), datos_preparados.datos_preparados.pesos()(), datos_preparados.datos_preparados.pesos()_sesgo())
+
+
+        #---------------------------------------------
+        # CREACIÓN DE LA RED NEURONAL
+        #---------------------------------------------
+        red = red_neuronas_multicapa(datos_preparados.neuEntrada(), datos_preparados.pesos(), datos_preparados.peso_sesgo())
 
 
         #---------------------------------------------
@@ -43,10 +49,6 @@ class neurona12():
 
         #Función de error de media cuadrática MSE
         funcion_error = tf.reduce_sum(tf.pow(datos_preparados.varReales()-red,2))
-
-        #Función de precisión
-        #funcion_precision = tf.metrics.accuracy(labels=datos_preparados.varReales(),predictions=red)
-
 
         #Descenso de gradiente con una tasa de aprendizaje fijada a 0,1
         optimizador = tf.train.GradientDescentOptimizer(learning_rate=self.tasa_aprendizaje).minimize(funcion_error)
@@ -73,7 +75,7 @@ class neurona12():
             #Realización del aprendizaje con actualización de los datos_preparados.pesos()
             sesion.run(optimizador, feed_dict = {datos_preparados.neuEntrada(): datos_preparados.train_test(0), datos_preparados.varReales():datos_preparados.train_test(2)})
 
-            #Calcular el error de aprendizaje
+            #Calcular el error
             MSE = sesion.run(funcion_error, feed_dict = {datos_preparados.neuEntrada(): datos_preparados.train_test(0), datos_preparados.varReales():datos_preparados.train_test(2)})
 
             #Visualización de la información
@@ -81,7 +83,7 @@ class neurona12():
             print("EPOCH (" + str(i) + "/" + str(self.epochs) + ") -  MSE: "+ str(MSE))
 
 
-        #Visualización gráfica MSE
+        #Visualización gráfica
         import matplotlib.pyplot as plt
         plt.plot(Grafica_MSE)
         plt.ylabel('MSE')
@@ -118,7 +120,7 @@ class neurona12():
         # PRECISIÓN EN LOS DATOS DE PRUEBAS
         #-------------------------------------------------------------------------
 
-        n_clasificaciones = 0
+        n_clasificaciones = 0;
         n_clasificaciones_correctas = 0
 
         #Se mira el conjunto de los datos de prueba (text_x)
@@ -126,7 +128,7 @@ class neurona12():
 
             #Se recupera la información
             datosSonar = datos_preparados.train_test(1)[i].reshape(1,60)
-            clasificacionEsperada = datos_preparados.train_test(1)[i].reshape(1,2)
+            clasificacionEsperada = datos_preparados.train_test(3)[i].reshape(1,2)
 
             # Se realiza la clasificación
             prediccion_run = sesion.run(clasificaciones, feed_dict={datos_preparados.neuEntrada():datosSonar})
@@ -136,7 +138,7 @@ class neurona12():
 
 
             #Se muestra para observación la clase original y la clasificación realizada
-            print(i,"Clase esperada: ", int(sesion.run(datos_preparados.varReales()[i][1],feed_dict={datos_preparados.varReales():datos_preparados.train_test(3)})), "Clasificación: ", prediccion_run[0] )
+            print(i,"Clase esperada: ", int(sesion.run(datos_preparados.varReales()[i][1],feed_dict={datos_preparados.varReales():datos_preparados.train_test(3)})), "Clasificacion: ", prediccion_run[0] )
 
             n_clasificaciones = n_clasificaciones+1
             if(accuracy_run*100 ==100):
@@ -151,7 +153,7 @@ class neurona12():
         # PRECISIÓN EN LOS DATOS DE APRENDIZAJE
         #-------------------------------------------------------------------------
 
-        n_clasificaciones = 0
+        n_clasificaciones = 0;
         n_clasificaciones_correctas = 0
         for i in range(0,datos_preparados.train_test(0).shape[0]):
 
@@ -178,7 +180,7 @@ class neurona12():
         #-------------------------------------------------------------------------
 
 
-        n_clasificaciones = 0
+        n_clasificaciones = 0;
         n_clasificaciones_correctas = 0
         for i in range(0,207):
 
@@ -202,7 +204,7 @@ def main():
     tasa_aprendizaje = 0.01
     epochs = 300
 
-    prueba_neurona12=neurona12(tasa_aprendizaje, epochs )
+    prueba_neurona12=neurona26(tasa_aprendizaje, epochs )
     prueba_neurona12.creacion_red_neuronal()
 
 if __name__ == '__main__':
