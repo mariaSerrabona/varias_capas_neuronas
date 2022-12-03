@@ -8,24 +8,25 @@ import tensorflow as tf
 
 class datos_preparados():
 
-    def __init__(self,X, y):
+    def __init__(self,observaciones, X, y):
+        self.observaciones=observaciones
         self.X=X
         self.y=y
 
     def train_test(self, indice):
 
-        observaciones = pnd.read_csv("datas/sonar.all-data.csv")
+        self.observaciones = pnd.read_csv("datas/sonar.all-data.csv")
 
         #---------------------------------------------
         # PREPARACIÓN DE LOS DATOS
         #---------------------------------------------
 
-        print("N.º columnas: ",len(observaciones.columns))
+        print("N.º columnas: ",len(self.observaciones.columns))
         #Para el parendizaje solo se toman los datos procedentes del sonar
-        self.X = observaciones[observaciones.columns[0:60]].values
+        self.X = self.observaciones[self.observaciones.columns[0:60]].values()
 
         #Solo se toman los etiquetados
-        self.y = observaciones[observaciones.columns[60]]
+        self.y = self.observaciones[self.observaciones.columns[60]]
 
         #Se codifica: Las minas son iguales a 0 y las rocas son iguales a 1
         encoder = LabelEncoder()
@@ -51,10 +52,10 @@ class datos_preparados():
         #---------------------------------------------
 
         #Mezclamos
-        X, Y = shuffle(X, Y, random_state=1)
+        self.X, Y = shuffle(self.X, Y, random_state=1)
 
         #Creación de los conjuntos de aprendizaje
-        train_x, test_x, train_y, test_y = train_test_split(X, Y, test_size=0.07, random_state=42)
+        train_x, test_x, train_y, test_y = train_test_split(self.X, Y, test_size=0.07, random_state=42)
 
         #Creación de los conjuntos de aprendizaje
         soluciones=[train_x, test_x, train_y, test_y]
@@ -70,20 +71,22 @@ class datos_preparados():
         if indice==4:
             return Y
         if indice==5:
-            return X
+            return self.X
 
+    @classmethod
     def neuEntrada(self):
 
         #Variable TensorFLow correspondiente a los 60 valores de las neuronas de entrada
         tf_neuronas_entradas_X = tf.compat.v1.placeholder(tf.float32,[None, 60])
         return tf_neuronas_entradas_X
 
+    @classmethod
     def varReales(self):
         #Variable TensorFlow correspondiente a 2 neuronas de salida
         tf_valores_reales_Y = tf.compat.v1.placeholder(tf.float32,[None, 2])
         return tf_valores_reales_Y
 
-
+    @classmethod
     def pesos(self):
         pesos = {
             # 60 neuronas de entradas hacia 24 Neuronas de la capa oculta
@@ -94,6 +97,7 @@ class datos_preparados():
         }
         return pesos
 
+    @classmethod
     def peso_sesgo(sesgo):
         peso_sesgo = {
             #1 sesgo de la capa de entrada hacia las 24 neuronas de la capa oculta

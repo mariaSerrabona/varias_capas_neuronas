@@ -4,32 +4,39 @@ import pandas as pnd
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import tensorflow as tf
-import preparacion_datos_24 import datos_preparados
+import preparacion_neuronas.preparacion_datos_24 as preparacion_datos_24
 
 #---------------------------------------------
 # FUNCIÓN DE CREACIÓN DE RED NEURONAL
 #---------------------------------------------
 class neuronas24():
 
-    def __init__(self ,tasa_aprendizaje, epochs, red):
+    def __init__(self ,tasa_aprendizaje, epochs):
         self.tasa_aprendizaje=tasa_aprendizaje
         self.epochs=epochs
 
     def red_neuronal(self):
 
-        observaciones = pnd.read_csv("datas/sonar.all-data.csv")
-        X = observaciones[observaciones.columns[0:60]].values
-        y = observaciones[observaciones.columns[60]]
+        # observaciones = pnd.read_csv("datas/sonar.all-data.csv")
+        # X = observaciones[observaciones.columns[0:60]].values
+        # y = observaciones[observaciones.columns[60]]
 
-        datos_preparados=datos_preparados( X, y)
+        # #datos_preparados=datos_preparados( observaciones,X, y)
 
-        def red_neuronas_multicapa( datos_preparados.pesos(), datos_preparados.peso_sego()):
+        def red_neuronas_multicapa():
 
             #Cálculo de la activación de la primera capa
-            primera_activacion = tf.math.sigmoid(tf.linalg.matmul(datos_preparados.neuEntrada(), datos_preparados.datos_preparados.pesos()['capa_entrada_hacia_oculta']) + datos_preparados.datos_preparados.pesos_sesgo()['datos_preparados.peso_sesgo()_capa_entrada_hacia_oculta'])
+            primera_activacion = tf.math.sigmoid(tf.linalg.matmul(preparacion_datos_24.datos_preparados.neuEntrada(),
+                                                                    preparacion_datos_24.datos_preparados.pesos()
+                                                                        ['capa_entrada_hacia_oculta']) + preparacion_datos_24.datos_preparados.peso_sesgo()
+                                                                                ['datos_preparados.peso_sesgo()_capa_entrada_hacia_oculta'])
 
             #Cálculo de la activación de la segunda capa
-            activacion_capa_oculta = tf.math.sigmoid(tf.linalg.matmul(primera_activacion, datos_preparados.pesos()['capa_oculta_hacia_salida']) + datos_preparados.peso_sesgo()['datos_preparados.peso_sesgo()_capa_oculta_hacia_salida'])
+            activacion_capa_oculta = tf.math.sigmoid(tf.linalg.matmul(primera_activacion,
+                                                                    preparacion_datos_24.datos_preparados.pesos()
+                                                                        ['capa_oculta_hacia_salida']) +
+                                                                            preparacion_datos_24.datos_preparados.peso_sesgo()
+                                                                            ['datos_preparados.peso_sesgo()_capa_oculta_hacia_salida'])
 
             return activacion_capa_oculta
 
@@ -37,7 +44,7 @@ class neuronas24():
         #---------------------------------------------
         # CREACIÓN DE LA RED NEURONAL
         #---------------------------------------------
-        red = red_neuronas_multicapa(datos_preparados.neuEntrada(), datos_preparados.pesos(), datos_preparados.peso_sesgo())
+        red = red_neuronas_multicapa()
 
 
         #---------------------------------------------
@@ -45,10 +52,10 @@ class neuronas24():
         #---------------------------------------------
 
         #Función de error de media cuadrática MSE
-        funcion_error = tf.reduce_sum(tf.pow(datos_preparados.varReales()-red,2))
+        funcion_error = tf.reduce_sum(tf.pow(preparacion_datos_24.datos_preparados.varReales()-red,2))
 
         #Descenso de gradiente con una tasa de aprendizaje fijada a 0,1
-        optimizador = tf.train.GradientDescentOptimizer(learning_rate=self.tasa_aprendizaje).minimize(funcion_error)
+        optimizador = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=self.tasa_aprendizaje).minimize(funcion_error)
 
 
         #---------------------------------------------
@@ -56,7 +63,7 @@ class neuronas24():
         #---------------------------------------------
 
         #Inicialización de la variable
-        init = tf.global_variables_initializer()
+        init = tf.compat.v1.global_variables_initializer()
 
         #Inicio de una sesión de aprendizaje
         sesion = tf.compat.v1.Session()
@@ -70,10 +77,16 @@ class neuronas24():
         for i in range(self.epochs):
 
             #Realicación del aprendizaje con actualización de los datos_preparados.datos_preparados.pesos()()
-            sesion.run(optimizador, feed_dict = {datos_preparados.neuEntrada(): datos_preparados.train_test(0), datos_preparados.varReales():datos_preparados.train_test(2)})
+            sesion.run(optimizador, feed_dict = {preparacion_datos_24.datos_preparados.neuEntrada():
+                                                    preparacion_datos_24.datos_preparados.train_test(self, 0),
+                                                    preparacion_datos_24.datos_preparados.varReales():
+                                                        preparacion_datos_24.datos_preparados.train_test(self, 2)})
 
             #Calcular el error
-            MSE = sesion.run(funcion_error, feed_dict = {datos_preparados.neuEntrada(): datos_preparados.train_test(0), datos_preparados.varReales():datos_preparados.train_test(2)})
+            MSE = sesion.run(funcion_error, feed_dict = {preparacion_datos_24.datos_preparados.neuEntrada():
+                                                        preparacion_datos_24.datos_preparados.train_test(self,0),
+                                                        preparacion_datos_24.datos_preparados.varReales():
+                                                        preparacion_datos_24.datos_preparados.train_test(self,2)})
 
 
             #Visualización de la información
@@ -119,25 +132,30 @@ class neuronas24():
         # PRECISIÓN EN LOS DATOS DE PRUEBAS
         #-------------------------------------------------------------------------
 
-        n_clasificaciones = 0;
+        n_clasificaciones = 0
         n_clasificaciones_correctas = 0
 
         #Miramos todo el conjunto de los datos de prueba (text_x)
-        for i in range(0,datos_preparados.train_test(1).shape[0]):
+        for i in range(0,preparacion_datos_24.datos_preparados.train_test(self,1).shape[0]):
 
             #Recuperamos la información
-            datosSonar = datos_preparados.train_test(1)[i].reshape(1,60)
-            clasificacionEsperada = datos_preparados.train_test(3)[i].reshape(1,2)
+            datosSonar = preparacion_datos_24.datos_preparados.train_test(self,1)[i].reshape(1,60)
+            clasificacionEsperada = preparacion_datos_24.datos_preparados.train_test(self, 3)[i].reshape(1,2)
 
             # Realizamos la clasificación
-            prediccion_run = sesion.run(clasificaciones, feed_dict={datos_preparados.neuEntrada():datosSonar})
+            prediccion_run = sesion.run(clasificaciones, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():datosSonar})
 
             #Calculamos la precisión de la clasificación con la ayuda de la fórmula establecida antes
-            accuracy_run = sesion.run(formula_precision, feed_dict={datos_preparados.neuEntrada():datosSonar, datos_preparados.varReales():clasificacionEsperada})
+            accuracy_run = sesion.run(formula_precision, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():
+                                                                    datosSonar, preparacion_datos_24.datos_preparados.varReales():
+                                                                    clasificacionEsperada})
 
 
             #Se muestra para observación la clase original y la clasificación realizada
-            print(i,"Clase esperada: ", int(sesion.run(datos_preparados.varReales()[i][1],feed_dict={datos_preparados.varReales():datos_preparados.train_test(3)})), "Clasificacion: ", prediccion_run[0] )
+            print(i,"Clase esperada: ", int(sesion.run(preparacion_datos_24.datos_preparados.varReales()[i][1],
+                                                        feed_dict={preparacion_datos_24.datos_preparados.varReales():
+                                                                    preparacion_datos_24.datos_preparados.train_test(self, 3)})),
+                                                                        "Clasificacion: ", prediccion_run[0] )
 
             n_clasificaciones = n_clasificaciones+1
             if(accuracy_run*100 ==100):
@@ -152,19 +170,22 @@ class neuronas24():
         # PRECISIÓN EN LOS DATOS DE APRENDIZAJE
         #-------------------------------------------------------------------------
 
-        n_clasificaciones = 0;
+        n_clasificaciones = 0
         n_clasificaciones_correctas = 0
-        for i in range(0,datos_preparados.train_test(0).shape[0]):
+        for i in range(0,preparacion_datos_24.datos_preparados.train_test(self,0).shape[0]):
 
             # Recuperamos las informaciones
-            datosSonar = datos_preparados.train_test(0)[i].reshape(1, 60)
-            clasificacionEsperada = datos_preparados.train_test(2)[i].reshape(1, 2)
+            datosSonar = preparacion_datos_24.datos_preparados.train_test(self,0)[i].reshape(1, 60)
+            clasificacionEsperada = preparacion_datos_24.datos_preparados.train_test(self,2)[i].reshape(1, 2)
 
             # Realizamos la claisifcación
-            prediccion_run = sesion.run(clasificaciones, feed_dict={datos_preparados.neuEntrada(): datosSonar})
+            prediccion_run = sesion.run(clasificaciones, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():
+                                                                        datosSonar})
 
             # Calculamos la precisión de la clasificación con la ayuda de la fórmula establecida antes
-            accuracy_run = sesion.run(formula_precision, feed_dict={datos_preparados.neuEntrada(): datosSonar, datos_preparados.varReales(): clasificacionEsperada})
+            accuracy_run = sesion.run(formula_precision, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():
+                                                                    datosSonar, datos_preparados.varReales():
+                                                                            clasificacionEsperada})
 
             n_clasificaciones = n_clasificaciones + 1
             if (accuracy_run * 100 == 100):
@@ -183,8 +204,11 @@ class neuronas24():
         n_clasificaciones_correctas = 0
         for i in range(0,207):
 
-            prediccion_run = sesion.run(clasificaciones, feed_dict={datos_preparados.neuEntrada():X[i].reshape(1,60)})
-            accuracy_run = sesion.run(formula_precision, feed_dict={datos_preparados.neuEntrada():X[i].reshape(1,60), datos_preparados.varReales():datos_preparados.train_test(4)[i].reshape(1,2)})
+            prediccion_run = sesion.run(clasificaciones, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():
+                                                                    X[i].reshape(1,60)})
+            accuracy_run = sesion.run(formula_precision, feed_dict={preparacion_datos_24.datos_preparados.neuEntrada():
+                                                                    X[i].reshape(1,60), preparacion_datos_24.datos_preparados.varReales():
+                                                                        preparacion_datos_24.datos_preparados.train_test(self,4)[i].reshape(1,2)})
 
             n_clasificaciones = n_clasificaciones + 1
             if (accuracy_run * 100 == 100):
@@ -204,8 +228,5 @@ def main():
     tasa_aprendizaje = 0.01
     epochs = 300
 
-    prueba_neurona12=neuronas24(tasa_aprendizaje, epochs )
-    prueba_neurona12.red_neuronal()
-
-if __name__ == '__main__':
-    main()
+    prueba_neurona24=neuronas24(tasa_aprendizaje, epochs )
+    prueba_neurona24.red_neuronal()

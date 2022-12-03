@@ -10,7 +10,8 @@ import tensorflow as tf
 
 class datos_preparados():
 
-    def __init__(self,X, y):
+    def __init__(self,observaciones, X, y):
+        self.observaciones=observaciones
         self.X=X
         self.y=y
     #---------------------------------------------
@@ -19,30 +20,30 @@ class datos_preparados():
 
 
     def train_test(self, indice):
-        observaciones = pnd.read_csv("datas/sonar.all-data.csv")
+        self.observaciones = pnd.read_csv("datas/sonar.all-data.csv")
         #---------------------------------------------
         # PREPARACIÓN DE LOS DATOS
         #---------------------------------------------
 
-        print("N.º columnas: ",len(observaciones.columns))
+        print("N.º columnas: ",len(self.observaciones.columns))
         #Para el aprendizaje solo tomamos loa datos procedentes del sonar
-        self.X = observaciones[observaciones.columns[0:60]].values
+        self.X = self.observaciones[self.observaciones.columns[0:60]].values
 
         #Solo se toman los etiquetados
-        self.y = observaciones[observaciones.columns[60]]
+        self.y = self.observaciones[self.observaciones.columns[60]]
 
         #Se codifica: Las minas son iguales a 0 y las rocas son iguales 1
         encoder = LabelEncoder()
         encoder.fit(self.y)
-        y = encoder.transform(self.y)
+        self.y = encoder.transform(self.y)
 
         #Se añade un cifrado para crear clases:
         # Si es una mina [1,0]
         # Si es una roca [0,1]
         n_labels = len(self.y)
-        n_unique_labels = len(np.unique(y))
+        n_unique_labels = len(np.unique(self.y))
         one_hot_encode = np.zeros((n_labels,n_unique_labels))
-        one_hot_encode[np.arange(n_labels),y] = 1
+        one_hot_encode[np.arange(n_labels),self.y] = 1
         Y=one_hot_encode
 
         #Verificación tomando los registros 0 y 97
@@ -55,7 +56,7 @@ class datos_preparados():
         #---------------------------------------------
 
         #Mezclamos
-        X, Y = shuffle(X, Y, random_state=1)
+        X, Y = shuffle(self.X, Y, random_state=1)
 
         #Creación de los conjuntos de aprendizaje
         train_x, test_x, train_y, test_y = train_test_split(X, Y, test_size=0.20, random_state=42)
@@ -73,29 +74,26 @@ class datos_preparados():
         if indice==4:
             return Y
         if indice==5:
-            return X
+            return self.X
 
 
     #---------------------------------------------
     # PARAMETRIZACIÓN DE LA RED NEURONAL
     #---------------------------------------------
 
-    epochs = 600
-    cantidad_neuronas_entrada = 60
-    cantidad_neuronas_salida = 2
-    tasa_aprendizaje = 0.01
-
+    @classmethod
     def neuEntrada(self):
         #Variable TensorFLow correspondiente a los 60 valores de las neuronas de entrada
         tf_neuronas_entradas_X = tf.compat.v1.placeholder(tf.float32,[None, 60])
         return tf_neuronas_entradas_X
 
-    def varRelaes(self):
+    @classmethod
+    def varReales(self):
         #Variable TensorFlow correspondiente a las 2 neuronas de salida
         tf_valores_reales_Y = tf.compat.v1.placeholder(tf.float32,[None, 2])
         return tf_valores_reales_Y
 
-
+    @classmethod
     def pesos():
         pesos = {
             #60 neuronas de las entradas hacia 24 Neuronas de la capa oculta
@@ -107,6 +105,7 @@ class datos_preparados():
 
         return pesos
 
+    @classmethod
     def peso_sesgo():
         peso_sesgo = {
             #1 sesgo de la capa de entrada hacia las 24 neuronas de la capa oculta
