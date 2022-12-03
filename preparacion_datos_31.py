@@ -13,7 +13,7 @@ class preparacion_datos():
         self.X=X
         self.y=y
 
-    def preparacion_de_datos(self):
+    def preparacion_de_datos(self, indice):
 
         #---------------------------------------------
         # PREPARACIÓN DE LOS DATOS
@@ -56,19 +56,34 @@ class preparacion_datos():
         #---------------------------------------------
         train_x, test_x, train_y, test_y = train_test_split(self.X, Y, test_size=0.20, random_state=42)
         soluciones=[train_x, test_x, train_y, test_y]
-        return soluciones
 
+        if indice==0:
+            return soluciones[0]
+        if indice==1:
+            return soluciones[1]
+        if indice==2:
+            return soluciones[2]
+        if indice==3:
+            return soluciones[3]
+        if indice==4:
+            return Y
+        if indice==5:
+            return self.X
+
+    @classmethod
     def neuEntrada(self):
 
         #Variable TensorFLow correspondiente a los 60 valores de las neuronas de entrada
         tf_neuronas_entradas_X = tf.compat.v1.placeholder(tf.float32,[None, 60])
         return tf_neuronas_entradas_X
 
+    @classmethod
     def varReales(self):
         #Variable TensorFlow correspondiente a las 2 neuronas de salida
         tf_valores_reales_Y = tf.compat.v1.placeholder(tf.float32,[None, 2])
         return tf_valores_reales_Y
 
+    @classmethod
     def pesos(self):
         pesos = {
             # 60 neuronas de entradas hacia 24 Neuronas de la capa oculta
@@ -79,6 +94,7 @@ class preparacion_datos():
         }
         return pesos
 
+    @classmethod
     def peso_sesgo(self):
         peso_sesgo = {
             #1 sesgo de capa de entrada hacia las 24 neuronas de la capa oculta
