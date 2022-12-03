@@ -8,19 +8,20 @@ import pandas as pnd
 
 class datos_preparados():
 
-    def __init__(self,X, y):
+    def __init__(self,observaciones, X, y):
+        self.observaciones=observaciones
         self.X=X
         self.y=y
 
     def train_test(self, indice):
-        observaciones = pnd.read_csv("datas/sonar.all-data.csv")
+        self.observaciones = pnd.read_csv("datas/sonar.all-data.csv")
 
-        print("N.º columnas: ",len(observaciones.columns))
+        print("N.º columnas: ",len(self.observaciones.columns))
         #Para el aprendizaje solo tomamos loa datos procedentes del sonar
-        self.X = observaciones[observaciones.columns[0:60]].values
+        self.X = self.observaciones[self.observaciones.columns[0:60]].values
 
         #Solo se toman los etiquetados
-        self.y = observaciones[observaciones.columns[60]]
+        self.y = self.observaciones[self.observaciones.columns[60]]
 
         #Se codifica: Las minas son iguales a 0 y las rocas son iguales 1
         encoder = LabelEncoder()
@@ -69,18 +70,21 @@ class datos_preparados():
     #---------------------------------------------
     # PARAMETRIZACIÓN DE LA RED NEURONAL
     #---------------------------------------------
+
+    @classmethod
     def neuEntrada(self):
 
         #Variable TensorFLow correspondiente a los 60 valores de las neuronas de entrada
         tf_neuronas_entradas_X = tf.compat.v1.placeholder(tf.float32,[None, 60])
         return tf_neuronas_entradas_X
 
-    def varReales(Self):
+    @classmethod
+    def varReales(self):
         #Variable TensorFlow correspondiente a las 2 neuronas de salida
         tf_valores_reales_Y = tf.compat.v1.placeholderr(tf.float32,[None, 2])
         return tf_valores_reales_Y
 
-
+    @classmethod
     def pesos(self):
         pesos = {
             #60 neuronas de las entradas hacia 24 Neuronas de la capa oculta
@@ -91,6 +95,7 @@ class datos_preparados():
         }
         return pesos
 
+    @classmethod
     def pesos_sesgo(self):
 
         peso_sesgo = {

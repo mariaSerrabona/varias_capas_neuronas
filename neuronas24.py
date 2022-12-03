@@ -4,7 +4,7 @@ import pandas as pnd
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import tensorflow as tf
-
+import preparacion_datos_24 import datos_preparados
 
 #---------------------------------------------
 # FUNCIÓN DE CREACIÓN DE RED NEURONAL
@@ -16,7 +16,6 @@ class neuronas24():
         self.epochs=epochs
 
     def red_neuronal(self):
-
 
         observaciones = pnd.read_csv("datas/sonar.all-data.csv")
         X = observaciones[observaciones.columns[0:60]].values
@@ -205,8 +204,8 @@ def main():
     tasa_aprendizaje = 0.01
     epochs = 300
 
-    prueba_neurona12=neurona26(tasa_aprendizaje, epochs )
-    prueba_neurona12.creacion_red_neuronal()
+    prueba_neurona12=neuronas24(tasa_aprendizaje, epochs )
+    prueba_neurona12.red_neuronal()
 
 if __name__ == '__main__':
     main()

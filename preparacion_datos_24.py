@@ -75,12 +75,12 @@ class datos_preparados():
     def neuEntrada(self):
 
         #Variable TensorFLow correspondiente a los 60 valores de las neuronas de entrada
-        tf_neuronas_entradas_X = tf.placeholder(tf.float32,[None, 60])
+        tf_neuronas_entradas_X = tf.compat.v1.placeholder(tf.float32,[None, 60])
         return tf_neuronas_entradas_X
 
     def varReales(self):
         #Variable TensorFlow correspondiente a 2 neuronas de salida
-        tf_valores_reales_Y = tf.placeholder(tf.float32,[None, 2])
+        tf_valores_reales_Y = tf.compat.v1.placeholder(tf.float32,[None, 2])
         return tf_valores_reales_Y
 
 

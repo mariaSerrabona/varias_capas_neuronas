@@ -20,7 +20,7 @@ class neurona31():
     def aprendizaje(self):
 
         observaciones = pnd.read_csv("datas/sonar.all-data.csv")
-        X = observaciones[observaciones.columns[0:60]].values
+        X = observaciones[observaciones.columns[0:60]].values()
         y = observaciones[observaciones.columns[60]]
 
         datos_preparados=preparacion_datos(observaciones, X, y)
@@ -34,13 +34,8 @@ class neurona31():
 
             return activacion_capa_oculta
 
-        self.red = red_neuronas_multicapa(datos_preparados.neuEntrada(), datos_preparados.pesos(), datos_preparados.peso_sesgo())
+        self.red = red_neuronas_multicapa()
 
-
-        lista_train_test=datos_preparados.preparacion_de_datos()
-
-        # train_x=lista_train_test[0]
-        # train_y = lista_train_test[2]
         #Función de error de media cuadrática MSE
         funcion_error = tf.reduce_sum(tf.pow(datos_preparados.varReales()-self.red,2))
 
